@@ -66,4 +66,4 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
         message.channel.send("https://cdn.discordapp.com/attachments/871824935016865858/871846793879638087/static-assets-upload2210855008168198565.jpg");
     }
 }));
-client.login("ODcxNzExODI5NDg1ODMwMTg0.YQfS5w.3Zt7I_ecYPxEYt3aEBNG66KAgnk");
+client.login("");
