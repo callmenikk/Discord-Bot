@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack",
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^16.4.10",
     "@types/node-fetch": "^2.5.12",
     "ts-loader": "^9.2.4",
     "typescript": "^4.3.5",

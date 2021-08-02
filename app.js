@@ -19,8 +19,8 @@ client.on("ready", () => {
     console.log("I'm ready");
 });
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const prefix = "|>";
+    var _a, _b;
+    const prefix = "!";
     if (message.author.bot)
         return;
     if (!message.guild)
@@ -29,8 +29,9 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
         return;
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const cmd = (_a = args.shift()) === null || _a === void 0 ? void 0 : _a.toLowerCase();
-    if (cmd === "ping")
-        message.channel.send("🏓  pong");
+    if (cmd === "ping") {
+        message.channel.send(`🏓 Latency is ${Date.now() - message.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
+    }
     if (cmd === "quote") {
         node_fetch_1.default("https://type.fit/api/quotes")
             .then(response => response.json())
@@ -41,5 +42,28 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
         })
             .catch(err => console.log(err));
     }
+    if (cmd === "command") {
+        message.channel.send(" ```I only have\n!ping\n!quote\nI'm under Development Process, some new Features will be added soon ```  ");
+    }
+    if (cmd === "say") {
+        if (message.deletable)
+            message.delete();
+        if (args.length < 1)
+            message.reply("nothing to say")
+                .then(m => m.delete({ timeout: 5000, reason: "idk" }));
+        const roleColor = (_b = message.guild.me) === null || _b === void 0 ? void 0 : _b.displayHexColor;
+        if (args[0].toLowerCase() === "embed") {
+            const embed = new discord_js_1.MessageEmbed()
+                .setColor("#dd0ef0")
+                .setDescription(args.slice(1).join(" "));
+            message.channel.send(embed);
+        }
+    }
+    if (cmd === "obamaballs") {
+        message.channel.send("https://media.tenor.com/images/c6755016355961ff8f9a4301d4bbb07d/tenor.png");
+    }
+    if (cmd === "sussybaka") {
+        message.channel.send("https://cdn.discordapp.com/attachments/871824935016865858/871846793879638087/static-assets-upload2210855008168198565.jpg");
+    }
 }));
-client.login("ODcxNzExODI5NDg1ODMwMTg0.YQfS5w.BOKMRWP02owsTnllnpyOVw1a5BU");
+client.login("ODcxNzExODI5NDg1ODMwMTg0.YQfS5w.3Zt7I_ecYPxEYt3aEBNG66KAgnk");
