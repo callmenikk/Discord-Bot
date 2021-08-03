@@ -14,12 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const node_fetch_1 = __importDefault(require("node-fetch"));
+const dotenv_1 = require("dotenv");
+dotenv_1.config({
+    path: __dirname + "/.env"
+});
 const client = new discord_js_1.Client();
 client.on("ready", () => {
     console.log("I'm ready");
 });
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c, _d;
     const prefix = "!";
     if (message.author.bot)
         return;
@@ -51,11 +55,11 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
         if (args.length < 1)
             message.reply("nothing to say")
                 .then(m => m.delete({ timeout: 5000, reason: "idk" }));
-        const roleColor = (_b = message.guild.me) === null || _b === void 0 ? void 0 : _b.displayHexColor;
         if (args[0].toLowerCase() === "embed") {
             const embed = new discord_js_1.MessageEmbed()
                 .setColor("#dd0ef0")
-                .setDescription(args.slice(1).join(" "));
+                .setDescription(args.slice(1).join(" "))
+                .setTimestamp();
             message.channel.send(embed);
         }
     }
@@ -65,5 +69,38 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
     if (cmd === "sussybaka") {
         message.channel.send("https://cdn.discordapp.com/attachments/871824935016865858/871846793879638087/static-assets-upload2210855008168198565.jpg");
     }
+    if (cmd === "whois") {
+        const userProfile = message.author.avatarURL();
+        const userRoles = (_b = message.member) === null || _b === void 0 ? void 0 : _b.roles.cache.map(r => r.name).slice(0, -1).toString().replace(/ ,/g, ",");
+        const userHEX = (_c = message.member) === null || _c === void 0 ? void 0 : _c.displayHexColor;
+        const createArray = message.author.createdAt.toString().split(" ");
+        const createDate = `${createArray[1]} ${createArray[2]} - ${createArray[3]}`;
+        const joinedArray = String((_d = message.guild.me) === null || _d === void 0 ? void 0 : _d.joinedAt).split(" ");
+        const joinedDate = `${joinedArray[1]} ${joinedArray[2]} - ${joinedArray[3]}`;
+        const exampleEmbed = new discord_js_1.MessageEmbed()
+            .setColor(userHEX)
+            .setTitle("User Info")
+            .setAuthor(`@${message.author.username}`, userProfile)
+            .setThumbnail(userProfile)
+            .setDescription("Some description here")
+            .addFields({
+            name: "Joined",
+            value: joinedDate,
+            inline: true,
+        }, {
+            name: "Registered",
+            value: createDate,
+            inline: true,
+        }, {
+            name: `Roles [${userRoles === null || userRoles === void 0 ? void 0 : userRoles.split(" ").length}]`,
+            value: userRoles,
+            inline: true,
+        })
+            .setTimestamp()
+            .setFooter(message.author.id, userProfile);
+        message.channel.send(exampleEmbed);
+    }
 }));
-client.login("");
+client.on("guildMemberAdd", (newMember) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+client.login(process.env.TOKEN);
