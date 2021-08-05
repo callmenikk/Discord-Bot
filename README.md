@@ -4,18 +4,18 @@ Discord Bot Which is made for Server - **[პროგრამირება](
 
 ## Discord Bot (Under Development Process)
 
-prefix (yet) - `!`
+prefix - `->`
 
 **Commands**
 
-`!covid` - global info about covid-19
+`->covid` - global info about covid-19
 
-`!whois` - (currently) information about your self on server
+`->whois` - (currently) information about your self on server
 
 ### High Order Commands
 
-`!ban` - bans member
+`->ban` - bans member
 
-`!kick` - kicks member
+`->kick` - kicks member
 
-`!mute` / `!unmute` - mute or unmutes member
+`->mute` / `->unmute` - mute or unmutes member
