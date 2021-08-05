@@ -1,7 +1,19 @@
-import { Client, GuildMember, MessageEmbed, MessageMentions } from "discord.js";
+import {
+  Client,
+  Collection,
+  ColorResolvable,
+  GuildMember,
+  Message,
+  MessageEmbed,
+  MessageMentions,
+  Role,
+  RoleResolvable,
+  User,
+} from "discord.js";
 import fetch from "node-fetch";
 import { config } from "dotenv";
 import { badWords } from "./badwords";
+import { resolve } from "path/posix";
 
 config({
   path: __dirname + "/.env",
@@ -62,7 +74,7 @@ client.on("message", async (message) => {
         const random: number = Math.floor(Math.random() * quote.length);
         const { text, author }: QuoteInterface<string> = quote[random];
 
-        const msg = message.channel.send(`*${text}* - **${author}**`);
+        message.channel.send(`*${text}* - **${author}**`);
       })
       .catch((err) => console.log(err));
   }
@@ -100,12 +112,16 @@ client.on("message", async (message) => {
     );
   }
   if (cmd === "whois") {
+    const taggedUser: User | undefined = message.mentions.users.first();
+
     const userProfile: any = message.author.avatarURL();
-    const userRolesLength: any = message.member?.roles.cache
+    const userRolesLength: string[] | undefined = message.member?.roles.cache
       .map((r) => r.name)
       .slice(0, -1);
     const userHEX: any = message.member?.displayHexColor;
-    const Roles: string = userRolesLength.map((e: any) => e);
+    const Roles: string[] | undefined = message.member?.roles.cache
+      .map((e) => e.name)
+      .slice(0, -1);
 
     const createArray: string[] = message.author.createdAt
       .toString()
@@ -205,8 +221,7 @@ client.on("message", async (message) => {
         message.channel.send(embed);
       })
       .catch((err) => console.log(err));
-  
-    }
+  }
   if (cmd === "kick") {
     if (!message.member?.hasPermission("KICK_MEMBERS")) {
       message.channel.send("You have no permissions to do that");
@@ -223,9 +238,7 @@ client.on("message", async (message) => {
     let mentionHighestRole: number = mentionMember.roles.highest.position;
 
     if (mentionHighestRole >= authorHighestRole) {
-      message.reply(
-        "You can`t kick members with equal or higher position"
-      );
+      message.reply("You can`t kick members with equal or higher position");
       return;
     }
 
@@ -233,11 +246,49 @@ client.on("message", async (message) => {
       message.reply("I have no permissions to kick this user");
       return;
     }
-    mentionMember.kick()
-    .then(() => message.channel.send(`Member ${mentionMember} has kicked out of server`))
-    .catch(console.error);
+    mentionMember
+      .kick()
+      .then(() =>
+        message.channel.send(`Member ${mentionMember} has kicked out of server`)
+      )
+      .catch(console.error);
   }
-})
+  if (cmd === "mute") {
+    const target: any = message.mentions.users.first();
+    if (target) {
+      const mainRole: any = message.guild.roles.cache.find(
+        (role) => role.name === "member"
+      );
+      const muteRole: any = message.guild.roles.cache.find(
+        (role) => role.name === "Muted"
+      );
+
+      let memeberTarget = message.guild.members.cache.get(target.id);
+      memeberTarget?.roles.remove(mainRole?.id);
+      memeberTarget?.roles.add(muteRole?.id);
+
+      message.channel.send(`Member ${target} has muted`)
+    } else {
+      message.reply("User Not Found");
+    }
+  }
+  if (cmd === "unmute") {
+    const target: any = message.mentions.users.first();
+
+    const mainRole: any = message.guild.roles.cache.find(
+      (role) => role.name === "member"
+    );
+    const muteRole: any = message.guild.roles.cache.find(
+      (role) => role.name === "Muted"
+    );
+
+    let memeberTarget = message.guild.members.cache.get(target.id);
+    memeberTarget?.roles.add(mainRole?.id);
+    memeberTarget?.roles.remove(muteRole?.id);
+  
+    message.channel.send(`Member ${target} has unmuted`)
+  }
+});
 
 client.on("message", async (message) => {
   if (message.author.bot) return;

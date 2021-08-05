@@ -32,7 +32,7 @@ client.on("ready", () => {
     console.log("I'm ready");
 });
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     const prefix = "!";
     if (message.author.bot)
         return;
@@ -54,7 +54,7 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             .then((quote) => {
             const random = Math.floor(Math.random() * quote.length);
             const { text, author } = quote[random];
-            const msg = message.channel.send(`*${text}* - **${author}**`);
+            message.channel.send(`*${text}* - **${author}**`);
         })
             .catch((err) => console.log(err));
     }
@@ -84,15 +84,16 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
         message.channel.send("https://cdn.discordapp.com/attachments/871824935016865858/871846793879638087/static-assets-upload2210855008168198565.jpg");
     }
     if (cmd === "whois") {
+        const taggedUser = message.mentions.users.first();
         const userProfile = message.author.avatarURL();
         const userRolesLength = (_c = message.member) === null || _c === void 0 ? void 0 : _c.roles.cache.map((r) => r.name).slice(0, -1);
         const userHEX = (_d = message.member) === null || _d === void 0 ? void 0 : _d.displayHexColor;
-        const Roles = userRolesLength.map((e) => e);
+        const Roles = (_e = message.member) === null || _e === void 0 ? void 0 : _e.roles.cache.map((e) => e.name).slice(0, -1);
         const createArray = message.author.createdAt
             .toString()
             .split(" ");
         const createDate = `${createArray[1]} ${createArray[2]} - ${createArray[3]}`;
-        const joinedArray = String((_e = message.guild.me) === null || _e === void 0 ? void 0 : _e.joinedAt).split(" ");
+        const joinedArray = String((_f = message.guild.me) === null || _f === void 0 ? void 0 : _f.joinedAt).split(" ");
         const joinedDate = `${joinedArray[1]} ${joinedArray[2]} - ${joinedArray[3]}`;
         const exampleEmbed = new discord_js_1.MessageEmbed()
             .setColor(userHEX)
@@ -156,11 +157,11 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             .catch((err) => console.log(err));
     }
     if (cmd === "kick") {
-        if (!((_f = message.member) === null || _f === void 0 ? void 0 : _f.hasPermission("KICK_MEMBERS"))) {
+        if (!((_g = message.member) === null || _g === void 0 ? void 0 : _g.hasPermission("KICK_MEMBERS"))) {
             message.channel.send("You have no permissions to do that");
             return;
         }
-        let mentionMember = (_h = (_g = message === null || message === void 0 ? void 0 : message.mentions) === null || _g === void 0 ? void 0 : _g.members) === null || _h === void 0 ? void 0 : _h.first();
+        let mentionMember = (_j = (_h = message === null || message === void 0 ? void 0 : message.mentions) === null || _h === void 0 ? void 0 : _h.members) === null || _j === void 0 ? void 0 : _j.first();
         if (!mentionMember) {
             message.channel.send("Please Mention Which Member Must Be Kicked");
             return;
@@ -175,9 +176,33 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             message.reply("I have no permissions to kick this user");
             return;
         }
-        mentionMember.kick()
+        mentionMember
+            .kick()
             .then(() => message.channel.send(`Member ${mentionMember} has kicked out of server`))
             .catch(console.error);
+    }
+    if (cmd === "mute") {
+        const target = message.mentions.users.first();
+        if (target) {
+            const mainRole = message.guild.roles.cache.find((role) => role.name === "member");
+            const muteRole = message.guild.roles.cache.find((role) => role.name === "Muted");
+            let memeberTarget = message.guild.members.cache.get(target.id);
+            memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.remove(mainRole === null || mainRole === void 0 ? void 0 : mainRole.id);
+            memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.add(muteRole === null || muteRole === void 0 ? void 0 : muteRole.id);
+            message.channel.send(`Member ${target} has muted`);
+        }
+        else {
+            message.reply("User Not Found");
+        }
+    }
+    if (cmd === "unmute") {
+        const target = message.mentions.users.first();
+        const mainRole = message.guild.roles.cache.find((role) => role.name === "member");
+        const muteRole = message.guild.roles.cache.find((role) => role.name === "Muted");
+        let memeberTarget = message.guild.members.cache.get(target.id);
+        memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.add(mainRole === null || mainRole === void 0 ? void 0 : mainRole.id);
+        memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.remove(muteRole === null || muteRole === void 0 ? void 0 : muteRole.id);
+        message.channel.send(`Member ${target} has unmuted`);
     }
 }));
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
