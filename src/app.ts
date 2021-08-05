@@ -1,8 +1,7 @@
-import { Client, MessageEmbed } from "discord.js";
+import { Client, GuildMember, MessageEmbed, MessageMentions } from "discord.js";
 import fetch from "node-fetch";
 import { config } from "dotenv";
-
-
+import { badWords } from "./badwords";
 
 config({
   path: __dirname + "/.env",
@@ -14,6 +13,21 @@ interface QuoteInterface<T> {
   text: string;
   author: T;
 }
+
+interface Player {
+  name: string;
+  dice?: number | undefined;
+}
+
+const playerone: Player = {
+  name: "",
+  dice: undefined,
+};
+
+const playertwo: Player = {
+  name: "",
+  dice: undefined,
+};
 
 const client = new Client();
 
@@ -191,19 +205,50 @@ client.on("message", async (message) => {
         message.channel.send(embed);
       })
       .catch((err) => console.log(err));
+  
+    }
+  if (cmd === "kick") {
+    if (!message.member?.hasPermission("KICK_MEMBERS")) {
+      message.channel.send("You have no permissions to do that");
+      return;
+    }
+
+    let mentionMember: GuildMember | undefined =
+      message?.mentions?.members?.first();
+    if (!mentionMember) {
+      message.channel.send("Please Mention Which Member Must Be Kicked");
+      return;
+    }
+    let authorHighestRole: number = message.member.roles.highest.position;
+    let mentionHighestRole: number = mentionMember.roles.highest.position;
+
+    if (mentionHighestRole >= authorHighestRole) {
+      message.reply(
+        "You can`t kick members with equal or higher position"
+      );
+      return;
+    }
+
+    if (!mentionMember.kickable) {
+      message.reply("I have no permissions to kick this user");
+      return;
+    }
+    mentionMember.kick()
+    .then(() => message.channel.send(`Member ${mentionMember} has kicked out of server`))
+    .catch(console.error);
   }
-});
+})
 
 client.on("message", async (message) => {
   if (message.author.bot) return;
   if (!message.guild) return;
 
-  const raw = message.content
-
-  fetch(`https://api.promptapi.com/bad_words?censor_character=${raw}`)
-    .then((response) => response.json())
-    .then((badword) => console.log(badword))
-    .catch((err) => console.log(err));
+  for (let i = 0; i < badWords.length; i++) {
+    if (message.content.toLowerCase().includes(badWords[i])) {
+      if (message.deletable) message.delete();
+      message.reply("Do Not Use Bad Words");
+    }
+  }
 });
 
 client.login(process.env.TOKEN);

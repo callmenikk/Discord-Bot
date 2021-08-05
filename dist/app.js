@@ -15,15 +15,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const dotenv_1 = require("dotenv");
+const badwords_1 = require("./badwords");
 dotenv_1.config({
     path: __dirname + "/.env",
 });
+const playerone = {
+    name: "",
+    dice: undefined,
+};
+const playertwo = {
+    name: "",
+    dice: undefined,
+};
 const client = new discord_js_1.Client();
 client.on("ready", () => {
     console.log("I'm ready");
 });
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const prefix = "!";
     if (message.author.bot)
         return;
@@ -146,16 +155,42 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
         })
             .catch((err) => console.log(err));
     }
+    if (cmd === "kick") {
+        if (!((_f = message.member) === null || _f === void 0 ? void 0 : _f.hasPermission("KICK_MEMBERS"))) {
+            message.channel.send("You have no permissions to do that");
+            return;
+        }
+        let mentionMember = (_h = (_g = message === null || message === void 0 ? void 0 : message.mentions) === null || _g === void 0 ? void 0 : _g.members) === null || _h === void 0 ? void 0 : _h.first();
+        if (!mentionMember) {
+            message.channel.send("Please Mention Which Member Must Be Kicked");
+            return;
+        }
+        let authorHighestRole = message.member.roles.highest.position;
+        let mentionHighestRole = mentionMember.roles.highest.position;
+        if (mentionHighestRole >= authorHighestRole) {
+            message.reply("You can`t kick members with equal or higher position");
+            return;
+        }
+        if (!mentionMember.kickable) {
+            message.reply("I have no permissions to kick this user");
+            return;
+        }
+        mentionMember.kick()
+            .then(() => message.channel.send(`Member ${mentionMember} has kicked out of server`))
+            .catch(console.error);
+    }
 }));
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
     if (message.author.bot)
         return;
     if (!message.guild)
         return;
-    const raw = message.content;
-    node_fetch_1.default(`https://api.promptapi.com/bad_words?censor_character=${raw}`)
-        .then((response) => response.json())
-        .then((badword) => console.log(badword))
-        .catch((err) => console.log(err));
+    for (let i = 0; i < badwords_1.badWords.length; i++) {
+        if (message.content.toLowerCase().includes(badwords_1.badWords[i])) {
+            if (message.deletable)
+                message.delete();
+            message.reply("Do Not Use Bad Words");
+        }
+    }
 }));
 client.login(process.env.TOKEN);

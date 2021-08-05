@@ -1,0 +1,21 @@
+export const badWords: string[] = [
+  "fuck",
+  "shit",
+  "pussy",
+  "ass",
+  "vagina",
+  "asshole",
+  "nigga",
+  "bitch",
+  "whore",
+  "yle",
+  "muteli",
+  "deda movtyan",
+  "dedamovtyan",
+  "dedassehveci",
+  "dedas sheveci",
+  "blowjob",
+  "mineti",
+  "ylistavi",
+  "kiltori"
+];
