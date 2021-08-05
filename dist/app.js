@@ -29,10 +29,10 @@ const playertwo = {
 };
 const client = new discord_js_1.Client();
 client.on("ready", () => {
-    console.log("I'm ready");
+    console.log("I'm Online");
 });
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     const prefix = "!";
     if (message.author.bot)
         return;
@@ -178,10 +178,25 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
         }
         mentionMember
             .kick()
-            .then(() => message.channel.send(`Member ${mentionMember} has kicked out of server`))
+            .then(() => {
+            let rejectEmbed = new discord_js_1.MessageEmbed()
+                .setColor("#52ff4d")
+                .setTitle(`Member ${mentionMember === null || mentionMember === void 0 ? void 0 : mentionMember.user.tag} has kicked out from server`)
+                .setFooter(message.author.id)
+                .setTimestamp();
+            message.channel.send(rejectEmbed);
+        })
             .catch(console.error);
     }
     if (cmd === "mute") {
+        if (!((_k = message.member) === null || _k === void 0 ? void 0 : _k.hasPermission("MANAGE_MESSAGES"))) {
+            let rejectEmbed = new discord_js_1.MessageEmbed()
+                .setColor("#ff4f4f")
+                .setTitle("You Don't have permission to do that")
+                .setFooter(message.author.id)
+                .setTimestamp();
+            message.channel.send(rejectEmbed);
+        }
         const target = message.mentions.users.first();
         if (target) {
             const mainRole = message.guild.roles.cache.find((role) => role.name === "member");
@@ -189,20 +204,74 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             let memeberTarget = message.guild.members.cache.get(target.id);
             memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.remove(mainRole === null || mainRole === void 0 ? void 0 : mainRole.id);
             memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.add(muteRole === null || muteRole === void 0 ? void 0 : muteRole.id);
-            message.channel.send(`Member ${target} has muted`);
+            message.channel.send(`${target} has been muted`);
         }
         else {
             message.reply("User Not Found");
         }
     }
     if (cmd === "unmute") {
-        const target = message.mentions.users.first();
-        const mainRole = message.guild.roles.cache.find((role) => role.name === "member");
-        const muteRole = message.guild.roles.cache.find((role) => role.name === "Muted");
-        let memeberTarget = message.guild.members.cache.get(target.id);
-        memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.add(mainRole === null || mainRole === void 0 ? void 0 : mainRole.id);
-        memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.remove(muteRole === null || muteRole === void 0 ? void 0 : muteRole.id);
-        message.channel.send(`Member ${target} has unmuted`);
+        if (!((_l = message.member) === null || _l === void 0 ? void 0 : _l.hasPermission("MANAGE_MESSAGES"))) {
+            let rejectEmbed = new discord_js_1.MessageEmbed()
+                .setColor("#ff4f4f")
+                .setTitle("You Don't have permission to do that")
+                .setFooter(message.author.id)
+                .setTimestamp();
+            message.channel.send(rejectEmbed);
+        }
+        else {
+            const target = message.mentions.users.first();
+            const mainRole = message.guild.roles.cache.find((role) => role.name === "member");
+            const muteRole = message.guild.roles.cache.find((role) => role.name === "Muted");
+            let memeberTarget = message.guild.members.cache.get(target.id);
+            memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.add(mainRole === null || mainRole === void 0 ? void 0 : mainRole.id);
+            memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.remove(muteRole === null || muteRole === void 0 ? void 0 : muteRole.id);
+            message.channel.send(`${target} has been unmuted`);
+        }
+    }
+    if (cmd === "ban") {
+        let banReason = args.join(" ").slice(22);
+        if (!banReason) {
+            banReason = "Not Mentioned";
+        }
+        const user = message.mentions.users.first();
+        if (user) {
+            const member = message.guild.members.resolve(user);
+            if (member) {
+                member
+                    .ban({
+                    reason: banReason,
+                })
+                    .then(() => {
+                    const embed = new discord_js_1.MessageEmbed()
+                        .setColor("#52ff4d")
+                        .setTitle(`Successfully banned ${user.tag}`)
+                        .setTimestamp();
+                    message.channel.send(embed);
+                })
+                    .catch((err) => {
+                    const embed = new discord_js_1.MessageEmbed()
+                        .setColor("#ff4f4f")
+                        .setTitle(`❌ You Do Not Have Permission To Do That`)
+                        .setTimestamp();
+                    message.channel.send(embed);
+                });
+            }
+            else {
+                const embed = new discord_js_1.MessageEmbed()
+                    .setColor("#ff4f4f")
+                    .setTitle(`❌ User Doesn't Exist`)
+                    .setTimestamp();
+                message.channel.send(embed);
+            }
+        }
+        else {
+            const embed = new discord_js_1.MessageEmbed()
+                .setColor("#ff4f4f")
+                .setTitle(`❌ User Doesn't Exist`)
+                .setTimestamp();
+            message.channel.send(embed);
+        }
     }
 }));
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {

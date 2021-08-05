@@ -9,6 +9,7 @@ import {
   Role,
   RoleResolvable,
   User,
+  UserResolvable,
 } from "discord.js";
 import fetch from "node-fetch";
 import { config } from "dotenv";
@@ -44,7 +45,7 @@ const playertwo: Player = {
 const client = new Client();
 
 client.on("ready", () => {
-  console.log("I'm ready");
+  console.log("I'm Online");
 });
 
 client.on("message", async (message) => {
@@ -248,12 +249,27 @@ client.on("message", async (message) => {
     }
     mentionMember
       .kick()
-      .then(() =>
-        message.channel.send(`Member ${mentionMember} has kicked out of server`)
-      )
+      .then(() =>{
+        let rejectEmbed = new MessageEmbed()
+          .setColor("#52ff4d")
+          .setTitle(`Member ${mentionMember?.user.tag} has kicked out from server`)
+          .setFooter(message.author.id)
+          .setTimestamp();
+
+        message.channel.send(rejectEmbed);
+      })
       .catch(console.error);
   }
   if (cmd === "mute") {
+    if (!message.member?.hasPermission("MANAGE_MESSAGES")) {
+      let rejectEmbed = new MessageEmbed()
+        .setColor("#ff4f4f")
+        .setTitle("You Don't have permission to do that")
+        .setFooter(message.author.id)
+        .setTimestamp();
+
+      message.channel.send(rejectEmbed);
+    }
     const target: any = message.mentions.users.first();
     if (target) {
       const mainRole: any = message.guild.roles.cache.find(
@@ -267,26 +283,79 @@ client.on("message", async (message) => {
       memeberTarget?.roles.remove(mainRole?.id);
       memeberTarget?.roles.add(muteRole?.id);
 
-      message.channel.send(`Member ${target} has muted`)
+      message.channel.send(`${target} has been muted`);
     } else {
       message.reply("User Not Found");
     }
   }
   if (cmd === "unmute") {
-    const target: any = message.mentions.users.first();
+    if (!message.member?.hasPermission("MANAGE_MESSAGES")) {
+      let rejectEmbed = new MessageEmbed()
+        .setColor("#ff4f4f")
+        .setTitle("You Don't have permission to do that")
+        .setFooter(message.author.id)
+        .setTimestamp();
 
-    const mainRole: any = message.guild.roles.cache.find(
-      (role) => role.name === "member"
-    );
-    const muteRole: any = message.guild.roles.cache.find(
-      (role) => role.name === "Muted"
-    );
+      message.channel.send(rejectEmbed);
+    } else {
+      const target: any = message.mentions.users.first();
 
-    let memeberTarget = message.guild.members.cache.get(target.id);
-    memeberTarget?.roles.add(mainRole?.id);
-    memeberTarget?.roles.remove(muteRole?.id);
-  
-    message.channel.send(`Member ${target} has unmuted`)
+      const mainRole: any = message.guild.roles.cache.find(
+        (role) => role.name === "member"
+      );
+      const muteRole: any = message.guild.roles.cache.find(
+        (role) => role.name === "Muted"
+      );
+
+      let memeberTarget = message.guild.members.cache.get(target.id);
+      memeberTarget?.roles.add(mainRole?.id);
+      memeberTarget?.roles.remove(muteRole?.id);
+
+      message.channel.send(`${target} has been unmuted`);
+    }
+  }
+  if (cmd === "ban") {
+    let banReason: string = args.join(" ").slice(22);
+    if(!banReason){
+      banReason = "Not Mentioned"
+    }
+
+    const user: User | undefined = message.mentions.users.first();
+    if (user) {
+      const member: GuildMember | null = message.guild.members.resolve(user);
+      if (member) {
+        member
+          .ban({
+            reason: banReason,
+          })
+          .then(() => {
+            const embed = new MessageEmbed()
+              .setColor("#52ff4d")
+              .setTitle(`Successfully banned ${user.tag}`)
+              .setTimestamp();
+            message.channel.send(embed)
+          })
+          .catch((err) => {
+            const embed = new MessageEmbed()
+              .setColor("#ff4f4f")
+              .setTitle(`❌ You Do Not Have Permission To Do That`)
+              .setTimestamp();
+            message.channel.send(embed);
+          });
+      } else {
+        const embed = new MessageEmbed()
+          .setColor("#ff4f4f")
+          .setTitle(`❌ User Doesn't Exist`)
+          .setTimestamp();
+        message.channel.send(embed);
+      }
+    } else {
+      const embed = new MessageEmbed()
+        .setColor("#ff4f4f")
+        .setTitle(`❌ User Doesn't Exist`)
+        .setTimestamp();
+      message.channel.send(embed);
+    }
   }
 });
 
