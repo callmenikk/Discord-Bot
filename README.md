@@ -2,7 +2,7 @@
 
 Discord Bot Which is made for Server - **[პროგრამირება](https://discord.gg/Up5MurgsWq)**
 
-## Obama Discord Bot (Under Development Process)
+## Discord Bot (Under Development Process)
 
 prefix (yet) - `!`
 
