@@ -10,7 +10,7 @@ prefix (yet) - `!`
 
 `!whois` - (currently) information about your self on server
 
-**High Order Commands**
+### High Order Commands
 
 `!ban` - bans member
 
