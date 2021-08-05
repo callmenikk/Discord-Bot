@@ -16,6 +16,6 @@ prefix (yet) - `!`
 
 `!ban` - bans member
 
-`kick` - kicks member
+`!kick` - kicks member
 
-`mute` / `unmute` - mute or unmutes member
+`!mute` / `!unmute` - mute or unmutes member
