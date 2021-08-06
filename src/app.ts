@@ -1,20 +1,7 @@
-import {
-  Client,
-  Collection,
-  ColorResolvable,
-  GuildMember,
-  Message,
-  MessageEmbed,
-  MessageMentions,
-  Role,
-  RoleResolvable,
-  User,
-  UserResolvable,
-} from "discord.js";
+import { Client, GuildMember, MessageEmbed, User } from "discord.js";
 import fetch from "node-fetch";
 import { config } from "dotenv";
 import { badWords } from "./badwords";
-import { resolve } from "path/posix";
 
 config({
   path: __dirname + "/.env",
@@ -244,15 +231,20 @@ client.on("message", async (message) => {
     }
 
     if (!mentionMember.kickable) {
-      message.reply("I have no permissions to kick this user");
+      let rejectEmbed = new MessageEmbed()
+        .setColor("#ff4f4f")
+        .setTitle("I have no permissions to kick this user");
+      message.channel.send(rejectEmbed);
       return;
     }
     mentionMember
       .kick()
-      .then(() =>{
+      .then(() => {
         let rejectEmbed = new MessageEmbed()
           .setColor("#52ff4d")
-          .setTitle(`Member ${mentionMember?.user.tag} has kicked out from server`)
+          .setTitle(
+            `Member ${mentionMember?.user.tag} has kicked out from server`
+          )
           .setFooter(message.author.id)
           .setTimestamp();
 
@@ -261,6 +253,20 @@ client.on("message", async (message) => {
       .catch(console.error);
   }
   if (cmd === "mute") {
+    let mentionMember: GuildMember | undefined =
+      message?.mentions?.members?.first();
+
+    let authorHighestRole: any = message.member?.roles.highest.position;
+    let mentionHighestRole: any = mentionMember?.roles.highest.position;
+
+    if (mentionHighestRole >= authorHighestRole) {
+      let rejectEmbed = new MessageEmbed()
+        .setColor("#ff4f4f")
+        .setTitle("You can`t mute members with equal or higher position");
+      message.channel.send(rejectEmbed);
+      return;
+    }
+
     if (!message.member?.hasPermission("MANAGE_MESSAGES")) {
       let rejectEmbed = new MessageEmbed()
         .setColor("#ff4f4f")
@@ -282,10 +288,13 @@ client.on("message", async (message) => {
       let memeberTarget = message.guild.members.cache.get(target.id);
       memeberTarget?.roles.remove(mainRole?.id);
       memeberTarget?.roles.add(muteRole?.id);
-
-      message.channel.send(`${target} has been muted`);
     } else {
-      message.reply("User Not Found");
+      let Embed = new MessageEmbed()
+        .setColor("#ff4f4f")
+        .setTitle("User No Found")
+        .setTimestamp();
+
+      message.channel.send(Embed);
     }
   }
   if (cmd === "unmute") {
@@ -293,7 +302,7 @@ client.on("message", async (message) => {
       let rejectEmbed = new MessageEmbed()
         .setColor("#ff4f4f")
         .setTitle("You Don't have permission to do that")
-        .setFooter(message.author.id)
+        .setFooter("Author: " + message.author.id)
         .setTimestamp();
 
       message.channel.send(rejectEmbed);
@@ -311,13 +320,17 @@ client.on("message", async (message) => {
       memeberTarget?.roles.add(mainRole?.id);
       memeberTarget?.roles.remove(muteRole?.id);
 
-      message.channel.send(`${target} has been unmuted`);
+      const embed = new MessageEmbed()
+        .setColor("#52ff4d")
+        .setTitle(`${target} was unmuted`)
+        .setTimestamp();
+      message.channel.send(embed);
     }
   }
   if (cmd === "ban") {
     let banReason: string = args.join(" ").slice(22);
-    if(!banReason){
-      banReason = "Not Mentioned"
+    if (!banReason) {
+      banReason = "Not Mentioned";
     }
 
     const user: User | undefined = message.mentions.users.first();
@@ -333,27 +346,24 @@ client.on("message", async (message) => {
               .setColor("#52ff4d")
               .setTitle(`Successfully banned ${user.tag}`)
               .setTimestamp();
-            message.channel.send(embed)
+            message.channel.send(embed);
           })
           .catch((err) => {
             const embed = new MessageEmbed()
               .setColor("#ff4f4f")
-              .setTitle(`❌ You Do Not Have Permission To Do That`)
-              .setTimestamp();
+              .setTitle(`❌ You Do Not Have Permission To Do That`);
             message.channel.send(embed);
           });
       } else {
         const embed = new MessageEmbed()
           .setColor("#ff4f4f")
-          .setTitle(`❌ User Doesn't Exist`)
-          .setTimestamp();
+          .setTitle(`❌ User Doesn't Exist`);
         message.channel.send(embed);
       }
     } else {
       const embed = new MessageEmbed()
         .setColor("#ff4f4f")
-        .setTitle(`❌ User Doesn't Exist`)
-        .setTimestamp();
+        .setTitle(`❌ User Doesn't Exist`);
       message.channel.send(embed);
     }
   }

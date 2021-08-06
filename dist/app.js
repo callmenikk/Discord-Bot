@@ -32,7 +32,7 @@ client.on("ready", () => {
     console.log("I'm Online");
 });
 client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
     const prefix = "!";
     if (message.author.bot)
         return;
@@ -173,7 +173,10 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             return;
         }
         if (!mentionMember.kickable) {
-            message.reply("I have no permissions to kick this user");
+            let rejectEmbed = new discord_js_1.MessageEmbed()
+                .setColor("#ff4f4f")
+                .setTitle("I have no permissions to kick this user");
+            message.channel.send(rejectEmbed);
             return;
         }
         mentionMember
@@ -189,7 +192,17 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             .catch(console.error);
     }
     if (cmd === "mute") {
-        if (!((_k = message.member) === null || _k === void 0 ? void 0 : _k.hasPermission("MANAGE_MESSAGES"))) {
+        let mentionMember = (_l = (_k = message === null || message === void 0 ? void 0 : message.mentions) === null || _k === void 0 ? void 0 : _k.members) === null || _l === void 0 ? void 0 : _l.first();
+        let authorHighestRole = (_m = message.member) === null || _m === void 0 ? void 0 : _m.roles.highest.position;
+        let mentionHighestRole = mentionMember === null || mentionMember === void 0 ? void 0 : mentionMember.roles.highest.position;
+        if (mentionHighestRole >= authorHighestRole) {
+            let rejectEmbed = new discord_js_1.MessageEmbed()
+                .setColor("#ff4f4f")
+                .setTitle("You can`t mute members with equal or higher position");
+            message.channel.send(rejectEmbed);
+            return;
+        }
+        if (!((_o = message.member) === null || _o === void 0 ? void 0 : _o.hasPermission("MANAGE_MESSAGES"))) {
             let rejectEmbed = new discord_js_1.MessageEmbed()
                 .setColor("#ff4f4f")
                 .setTitle("You Don't have permission to do that")
@@ -204,18 +217,21 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             let memeberTarget = message.guild.members.cache.get(target.id);
             memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.remove(mainRole === null || mainRole === void 0 ? void 0 : mainRole.id);
             memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.add(muteRole === null || muteRole === void 0 ? void 0 : muteRole.id);
-            message.channel.send(`${target} has been muted`);
         }
         else {
-            message.reply("User Not Found");
+            let Embed = new discord_js_1.MessageEmbed()
+                .setColor("#ff4f4f")
+                .setTitle("User No Found")
+                .setTimestamp();
+            message.channel.send(Embed);
         }
     }
     if (cmd === "unmute") {
-        if (!((_l = message.member) === null || _l === void 0 ? void 0 : _l.hasPermission("MANAGE_MESSAGES"))) {
+        if (!((_p = message.member) === null || _p === void 0 ? void 0 : _p.hasPermission("MANAGE_MESSAGES"))) {
             let rejectEmbed = new discord_js_1.MessageEmbed()
                 .setColor("#ff4f4f")
                 .setTitle("You Don't have permission to do that")
-                .setFooter(message.author.id)
+                .setFooter("Author: " + message.author.id)
                 .setTimestamp();
             message.channel.send(rejectEmbed);
         }
@@ -226,7 +242,11 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             let memeberTarget = message.guild.members.cache.get(target.id);
             memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.add(mainRole === null || mainRole === void 0 ? void 0 : mainRole.id);
             memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.remove(muteRole === null || muteRole === void 0 ? void 0 : muteRole.id);
-            message.channel.send(`${target} has been unmuted`);
+            const embed = new discord_js_1.MessageEmbed()
+                .setColor("#52ff4d")
+                .setTitle(`${target} was unmuted`)
+                .setTimestamp();
+            message.channel.send(embed);
         }
     }
     if (cmd === "ban") {
@@ -252,24 +272,21 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
                     .catch((err) => {
                     const embed = new discord_js_1.MessageEmbed()
                         .setColor("#ff4f4f")
-                        .setTitle(`❌ You Do Not Have Permission To Do That`)
-                        .setTimestamp();
+                        .setTitle(`❌ You Do Not Have Permission To Do That`);
                     message.channel.send(embed);
                 });
             }
             else {
                 const embed = new discord_js_1.MessageEmbed()
                     .setColor("#ff4f4f")
-                    .setTitle(`❌ User Doesn't Exist`)
-                    .setTimestamp();
+                    .setTitle(`❌ User Doesn't Exist`);
                 message.channel.send(embed);
             }
         }
         else {
             const embed = new discord_js_1.MessageEmbed()
                 .setColor("#ff4f4f")
-                .setTitle(`❌ User Doesn't Exist`)
-                .setTimestamp();
+                .setTitle(`❌ User Doesn't Exist`);
             message.channel.send(embed);
         }
     }
