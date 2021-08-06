@@ -1,4 +1,4 @@
-# Obama-Discord-Bot
+# Discord-Bot
 
 Discord Bot Which is made for Server - **[პროგრამირება](https://discord.gg/Up5MurgsWq)**
 
