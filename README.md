@@ -23,3 +23,7 @@ prefix - `->`
 `->kick` - kicks member
 
 `->mute` / `->unmute` - mute or unmutes member
+
+## Help
+
+for more commands type `->command`
