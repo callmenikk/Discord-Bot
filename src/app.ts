@@ -296,6 +296,10 @@ client.on("message", async (message) => {
 
       message.channel.send(Embed);
     }
+          let rejectEmbed = new MessageEmbed()
+            .setColor("#ff4f4f")
+            .setTitle(`${target.tag} was muted`);
+          message.channel.send(rejectEmbed);
   }
   if (cmd === "unmute") {
     if (!message.member?.hasPermission("MANAGE_MESSAGES")) {
@@ -322,7 +326,7 @@ client.on("message", async (message) => {
 
       const embed = new MessageEmbed()
         .setColor("#52ff4d")
-        .setTitle(`${target} was unmuted`)
+        .setTitle(`${target.tag} was unmuted`)
         .setTimestamp();
       message.channel.send(embed);
     }

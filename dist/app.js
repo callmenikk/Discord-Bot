@@ -225,6 +225,10 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
                 .setTimestamp();
             message.channel.send(Embed);
         }
+        let rejectEmbed = new discord_js_1.MessageEmbed()
+            .setColor("#ff4f4f")
+            .setTitle(`${target.tag} was muted`);
+        message.channel.send(rejectEmbed);
     }
     if (cmd === "unmute") {
         if (!((_p = message.member) === null || _p === void 0 ? void 0 : _p.hasPermission("MANAGE_MESSAGES"))) {
@@ -244,7 +248,7 @@ client.on("message", (message) => __awaiter(void 0, void 0, void 0, function* ()
             memeberTarget === null || memeberTarget === void 0 ? void 0 : memeberTarget.roles.remove(muteRole === null || muteRole === void 0 ? void 0 : muteRole.id);
             const embed = new discord_js_1.MessageEmbed()
                 .setColor("#52ff4d")
-                .setTitle(`${target} was unmuted`)
+                .setTitle(`${target.tag} was unmuted`)
                 .setTimestamp();
             message.channel.send(embed);
         }
