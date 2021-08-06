@@ -10,7 +10,11 @@ prefix - `->`
 
 `->covid` - global info about covid-19
 
-`->whois` - (currently) information about your self on server
+`->whois` - information about your self on server
+
+`->play` - plays music in voice channel
+
+`->leave` - bot leaves voice channel
 
 ### High Order Commands
 
