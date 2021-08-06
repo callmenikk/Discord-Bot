@@ -2,7 +2,7 @@
 
 Discord Bot Which is made for Server - **[პროგრამირება](https://discord.gg/Up5MurgsWq)**
 
-## Discord Bot (Under Development Process)
+## პროგრამირება-Bot v1.0
 
 prefix - `->`
 

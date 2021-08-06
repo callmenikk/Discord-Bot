@@ -19,10 +19,22 @@
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
+    "@discordjs/opus": "^0.5.3",
+    "@types/yt-search": "^2.3.2",
     "ascii-table": "0.0.9",
+    "discord-player": "^4.1.4",
+    "discord-ytdl-core": "^5.0.4",
     "discord.js": "^12.5.3",
+    "distube": "^2.8.15",
     "dotenv": "^10.0.0",
+    "ffmpeg-static": "^4.4.0",
     "fs": "0.0.1-security",
-    "node-fetch": "^2.6.1"
+    "merge-options": "^3.0.4",
+    "node-fetch": "^2.6.1",
+    "soundcloud-scraper": "^5.0.1",
+    "spotify-url-info": "^2.2.3",
+    "youtube-sr": "^4.1.7",
+    "yt-search": "^2.10.0",
+    "ytdl-core": "^4.9.1"
   }
 }

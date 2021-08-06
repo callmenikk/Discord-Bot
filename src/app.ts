@@ -1,7 +1,7 @@
 import { Client, GuildMember, MessageEmbed, User } from "discord.js";
 import fetch from "node-fetch";
 import { config } from "dotenv";
-import { badWords } from "./badwords";
+import Distube from "distube";
 
 config({
   path: __dirname + "/.env",
@@ -14,29 +14,19 @@ interface QuoteInterface<T> {
   author: T;
 }
 
-interface Player {
-  name: string;
-  dice?: number | undefined;
-}
+const client: Client = new Client();
 
-const playerone: Player = {
-  name: "",
-  dice: undefined,
-};
-
-const playertwo: Player = {
-  name: "",
-  dice: undefined,
-};
-
-const client = new Client();
+const distube: Distube = new Distube(client, {
+  searchSongs: false,
+  emitNewSongOnly: true,
+});
 
 client.on("ready", () => {
   console.log("I'm Online");
 });
 
 client.on("message", async (message) => {
-  const prefix: string = "!";
+  const prefix: string = "->";
 
   if (message.author.bot) return;
   if (!message.guild) return;
@@ -50,9 +40,9 @@ client.on("message", async (message) => {
 
   if (cmd === "ping") {
     message.channel.send(
-      `🏓 Latency is ${
+      `🏓 შეყოვნება არის ${
         Date.now() - message.createdTimestamp
-      }ms. API Latency is ${Math.round(client.ws.ping)}ms`
+      }ms. ეი პი აის შეყოვნება არის ${Math.round(client.ws.ping)}ms`
     );
   }
   if (cmd === "quote") {
@@ -67,37 +57,30 @@ client.on("message", async (message) => {
       .catch((err) => console.log(err));
   }
   if (cmd === "command") {
-    message.channel.send(
-      " ```I only have\n!ping\n!quote\nI'm under Development Process, some new Features will be added soon ```  "
-    );
-  }
-  if (cmd === "say") {
-    if (message.deletable) message.delete();
+    const commandEmbed = new MessageEmbed()
+      .setColor("#fff23d")
+      .setTitle("ბრძანებების სია")
+      .addFields(
+        { name: "`->covid`", value: "Covid-19 გლობალური სტატისტიკა" },
+        { name: "`->quote`", value: "რენდომ ციტატა" },
+        { name: "`->play`", value: "რთავს მუსიკას ხმოვან არხში" },
+        { name: "`->leave`", value: "ბოტი გადის ხმოვანი არხიდან" },
+        { name: "`->whois`", value: "ინფორმაცია თქვენს შესახებ" },
+        {
+          name: "**მაღალი როლის კომანდები**",
+          value: "-",
+        }
+      )
+      .addFields(
+        {
+          name: "`->mute` / `unmute`",
+          value: "მუთავს ან ხსნის მიუთს მომხმარებელს",
+        },
+        { name: "`->kick`", value: "აგდებს მომხმარებელს სერვერიდან" },
+        { name: "`->ban`", value: "ბანს ადებს მომხმარებელს" }
+      );
 
-    if (args.length < 1)
-      message
-        .reply("nothing to say")
-        .then((m) => m.delete({ timeout: 5000, reason: "idk" }));
-
-    if (args[0].toLowerCase() === "embed") {
-      const userHEX: any = message.member?.displayHexColor;
-
-      const embed = new MessageEmbed()
-        .setColor(userHEX)
-        .setDescription(args.slice(1).join(" "))
-        .setTimestamp();
-      message.channel.send(embed);
-    }
-  }
-  if (cmd === "obamaballs") {
-    message.channel.send(
-      "https://media.tenor.com/images/c6755016355961ff8f9a4301d4bbb07d/tenor.png"
-    );
-  }
-  if (cmd === "sussybaka") {
-    message.channel.send(
-      "https://cdn.discordapp.com/attachments/871824935016865858/871846793879638087/static-assets-upload2210855008168198565.jpg"
-    );
+      message.channel.send(commandEmbed)
   }
   if (cmd === "whois") {
     const taggedUser: User | undefined = message.mentions.users.first();
@@ -124,20 +107,19 @@ client.on("message", async (message) => {
       .setTitle("User Info")
       .setAuthor(`${message.author.tag}`, userProfile)
       .setThumbnail(userProfile)
-      .setDescription("Some description here")
       .addFields(
         {
-          name: "Joined",
+          name: "შემოუერთდა სერვერს",
           value: joinedDate,
           inline: true,
         },
         {
-          name: "Registered",
+          name: "დარეგისტრირდა",
           value: createDate,
           inline: true,
         },
         {
-          name: `Roles [${userRolesLength?.length}]`,
+          name: `როლები [${userRolesLength?.length}]`,
           value: Roles,
           inline: false,
         }
@@ -147,11 +129,6 @@ client.on("message", async (message) => {
 
     message.channel.send(exampleEmbed);
   }
-  if (cmd === "roll") {
-    const dice: number = Math.floor(Math.random() * 5) + 1;
-
-    message.channel.send(`You get the ${dice}`);
-  }
   if (cmd === "covid") {
     fetch("https://api.covid19api.com/summary")
       .then((response) => response.json())
@@ -160,13 +137,13 @@ client.on("message", async (message) => {
 
         const embed = new MessageEmbed()
           .setColor("#4f1e1b")
-          .setTitle("Covid-19 Global Stats")
+          .setTitle("Covid-19-ის გლობალური სტატისტიკა")
           .setThumbnail(
             "https://images.newscientist.com/wp-content/uploads/2020/02/11165812/c0481846-wuhan_novel_coronavirus_illustration-spl.jpg"
           )
           .addFields(
             {
-              name: "New Confirmed",
+              name: "ახალი დადასტურებული",
               value: String(CovidData.NewConfirmed).replace(
                 /\B(?=(\d{3})+(?!\d))/g,
                 ","
@@ -174,7 +151,7 @@ client.on("message", async (message) => {
               inline: true,
             },
             {
-              name: "Total Confirmed",
+              name: "საერთო დადასტურებული",
               value: String(CovidData.TotalConfirmed).replace(
                 /\B(?=(\d{3})+(?!\d))/g,
                 ","
@@ -182,7 +159,7 @@ client.on("message", async (message) => {
               inline: true,
             },
             {
-              name: "New Deaths",
+              name: "ახალი გარდაცვლილი",
               value: String(CovidData.NewDeaths).replace(
                 /\B(?=(\d{3})+(?!\d))/g,
                 ","
@@ -190,7 +167,7 @@ client.on("message", async (message) => {
               inline: true,
             },
             {
-              name: "New Recovered",
+              name: "ახალ გამოჯანმრთელებულთა ოდენობა",
               value: String(CovidData.NewRecovered).replace(
                 /\B(?=(\d{3})+(?!\d))/g,
                 ","
@@ -198,7 +175,7 @@ client.on("message", async (message) => {
               inline: false,
             },
             {
-              name: "Total Recovered",
+              name: "ტოტალურ გამოჯანმრთელებულთა ოდენობა",
               value: String(CovidData.TotalRecovered).replace(
                 /\B(?=(\d{3})+(?!\d))/g,
                 ","
@@ -212,28 +189,31 @@ client.on("message", async (message) => {
   }
   if (cmd === "kick") {
     if (!message.member?.hasPermission("KICK_MEMBERS")) {
-      message.channel.send("You have no permissions to do that");
+            let rejectEmbed = new MessageEmbed()
+              .setColor("#ff4f4f")
+              .setTitle("შენ არ გაქვს ამ ბრძანების უფლება")
+            message.channel.send(rejectEmbed);
       return;
     }
 
     let mentionMember: GuildMember | undefined =
       message?.mentions?.members?.first();
     if (!mentionMember) {
-      message.channel.send("Please Mention Which Member Must Be Kicked");
+      message.channel.send("გთხოვთ წარადგინოთ რომელი მომხმარებლის გაგადება გსურთ");
       return;
     }
     let authorHighestRole: number = message.member.roles.highest.position;
     let mentionHighestRole: number = mentionMember.roles.highest.position;
 
     if (mentionHighestRole >= authorHighestRole) {
-      message.reply("You can`t kick members with equal or higher position");
+      message.reply("შენ ვერ გააგდებ შენზე მაღალი როლის ან იგივე როლის მქონე ადამიანს");
       return;
     }
 
     if (!mentionMember.kickable) {
       let rejectEmbed = new MessageEmbed()
         .setColor("#ff4f4f")
-        .setTitle("I have no permissions to kick this user");
+        .setTitle("შენ არ გაქვს უფლება გააგდო ეს ადამიანი სერვერიდან");
       message.channel.send(rejectEmbed);
       return;
     }
@@ -243,7 +223,7 @@ client.on("message", async (message) => {
         let rejectEmbed = new MessageEmbed()
           .setColor("#52ff4d")
           .setTitle(
-            `Member ${mentionMember?.user.tag} has kicked out from server`
+            `მომხმარებელი ${mentionMember?.user.tag} გაგდებულია სერვერიდან`
           )
           .setFooter(message.author.id)
           .setTimestamp();
@@ -262,7 +242,7 @@ client.on("message", async (message) => {
     if (mentionHighestRole >= authorHighestRole) {
       let rejectEmbed = new MessageEmbed()
         .setColor("#ff4f4f")
-        .setTitle("You can`t mute members with equal or higher position");
+        .setTitle("შენ არ შეგიძლია დამუტო შენზე მაღალი ან იგივე როლის მქონე ადამიანი");
       message.channel.send(rejectEmbed);
       return;
     }
@@ -270,7 +250,7 @@ client.on("message", async (message) => {
     if (!message.member?.hasPermission("MANAGE_MESSAGES")) {
       let rejectEmbed = new MessageEmbed()
         .setColor("#ff4f4f")
-        .setTitle("You Don't have permission to do that")
+        .setTitle("შენ არ გაქვს ამ ბრძანების უფლება")
         .setFooter(message.author.id)
         .setTimestamp();
 
@@ -279,7 +259,7 @@ client.on("message", async (message) => {
     const target: any = message.mentions.users.first();
     if (target) {
       const mainRole: any = message.guild.roles.cache.find(
-        (role) => role.name === "member"
+        (role) => role.name === "წევრი"
       );
       const muteRole: any = message.guild.roles.cache.find(
         (role) => role.name === "Muted"
@@ -291,23 +271,21 @@ client.on("message", async (message) => {
     } else {
       let Embed = new MessageEmbed()
         .setColor("#ff4f4f")
-        .setTitle("User No Found")
+        .setTitle("მომხმარებელი არ არსებობს სერვერზე")
         .setTimestamp();
 
       message.channel.send(Embed);
     }
-          let rejectEmbed = new MessageEmbed()
-            .setColor("#ff4f4f")
-            .setTitle(`${target.tag} was muted`);
-          message.channel.send(rejectEmbed);
+    let rejectEmbed = new MessageEmbed()
+      .setColor("52ff4d")
+      .setTitle(`${target.tag} დაიმუტა`);
+    message.channel.send(rejectEmbed);
   }
   if (cmd === "unmute") {
     if (!message.member?.hasPermission("MANAGE_MESSAGES")) {
       let rejectEmbed = new MessageEmbed()
         .setColor("#ff4f4f")
-        .setTitle("You Don't have permission to do that")
-        .setFooter("Author: " + message.author.id)
-        .setTimestamp();
+        .setTitle("შენ არ გაქვს ამ ბრძანების უფლება")
 
       message.channel.send(rejectEmbed);
     } else {
@@ -326,7 +304,7 @@ client.on("message", async (message) => {
 
       const embed = new MessageEmbed()
         .setColor("#52ff4d")
-        .setTitle(`${target.tag} was unmuted`)
+        .setTitle(`მომხმარებელ ${target.tag}-ს მოეხსნა მიუთი`)
         .setTimestamp();
       message.channel.send(embed);
     }
@@ -334,7 +312,7 @@ client.on("message", async (message) => {
   if (cmd === "ban") {
     let banReason: string = args.join(" ").slice(22);
     if (!banReason) {
-      banReason = "Not Mentioned";
+      banReason = "არ არის ნახსენები";
     }
 
     const user: User | undefined = message.mentions.users.first();
@@ -348,40 +326,101 @@ client.on("message", async (message) => {
           .then(() => {
             const embed = new MessageEmbed()
               .setColor("#52ff4d")
-              .setTitle(`Successfully banned ${user.tag}`)
+              .setTitle(`წარმატებით დაიბანა ${user.tag}`)
               .setTimestamp();
             message.channel.send(embed);
           })
           .catch((err) => {
             const embed = new MessageEmbed()
               .setColor("#ff4f4f")
-              .setTitle(`❌ You Do Not Have Permission To Do That`);
+              .setTitle(`❌ შენ არ გაქვს ამ ბრძანების უფლება!`);
             message.channel.send(embed);
           });
       } else {
         const embed = new MessageEmbed()
           .setColor("#ff4f4f")
-          .setTitle(`❌ User Doesn't Exist`);
+          .setTitle(`❌ მომხმარებელი არ არსებობს სერვერზე`);
         message.channel.send(embed);
       }
     } else {
       const embed = new MessageEmbed()
         .setColor("#ff4f4f")
-        .setTitle(`❌ User Doesn't Exist`);
+        .setTitle(`❌ მომხმარებელი არ არსებობს სერვერზე`);
       message.channel.send(embed);
     }
   }
-});
+  // Queue status template
+  const status = (queue: any) =>
+    `ხმის დონე: \`${queue.volume}%\` | ფილტრაცია: \`${
+      queue.filter || "Off"
+    }\` | ლუპი: \`${
+      queue.repeatMode
+        ? queue.repeatMode == 2
+          ? "ყველა სია"
+          : "მუსიკა"
+        : "Off"
+    }\` | აუტოჩართვა: \`${queue.autoplay ? "On" : "Off"}\``;
 
-client.on("message", async (message) => {
-  if (message.author.bot) return;
-  if (!message.guild) return;
+  // DisTube event listeners, more in the documentation page
+  distube
+    .on("playSong", (message, queue, song) =>
+      message.channel.send(
+        `ახლა ჩაირთო \`${song.name}\` - \`${
+          song.formattedDuration
+        }\`\nმოთხოვნილი იქნა: ${song.user.tag}\n${status(queue)}`
+      )
+    )
+    .on("addSong", (message, queue, song) =>
+      message.channel.send(
+        `დაემატა ${song.name} - \`${song.formattedDuration}\` სიაში by ${song.user.tag} მიერ`
+      )
+    )
+    .on("playList", (message, queue, playlist, song) =>
+      message.channel.send(
+        `ჩაირთო \`${playlist.name}\` playlist (${
+          playlist.songs.length
+        } songs).\nმოთხოვნილი იქნა: ${song.user.tag}\nახლა მიმდინარეობს \`${
+          song.name
+        }\` - \`${song.formattedDuration}\`\n${status(queue)}`
+      )
+    )
+    .on("addList", (message, queue, playlist) =>
+      message.channel.send(
+        `დაემატა \`${playlist.name}\` ფლეილისტ (${
+          playlist.songs.length
+        } songs) სიაში \n${status(queue)}`
+      )
+    )
+    // DisTubeOptions.searchSongs = true
+    .on("searchResult", (message, result) => {
+      let i = 0;
+      message.channel.send(
+        `**აირჩიე ქვევიდან პარამეტრი**\n${result
+          .map(
+            (song) => `**${++i}**. ${song.name} - \`${song.formattedDuration}\``
+          )
+          .join("\n")}\n*შეიყვანე 60 წამში თორემ ბოტი გავა არხიდან*`
+      );
+    })
+    // DisTubeOptions.searchSongs = true
+    .on("searchCancel", (message) => message.channel.send(`შეწყდა ძიება`))
+    .on("error", (message, e) => {
+      console.error(e);
+      message.channel.send("წარმოიშვა შეცდომა: " + e);
+    });
 
-  for (let i = 0; i < badWords.length; i++) {
-    if (message.content.toLowerCase().includes(badWords[i])) {
-      if (message.deletable) message.delete();
-      message.reply("Do Not Use Bad Words");
-    }
+  if (cmd === "play") {
+    if (!message.member?.voice.channel)
+      return message.channel.send("ჯერ შედით ხმოვან არხში.");
+    if (!args[0]) return message.channel.send("შეიყვანეთ მუსიკის დასახელება.");
+
+    distube.play(message, args.join(" "));
+  }
+  if (cmd === "leave") {
+    if (!message.member?.voice.channel) return message.channel.send("ჯერ შედით ხმოვან არხში.");
+
+    distube.stop(message);
+    message.channel.send("ნახვამდის 🤍");
   }
 });
 
