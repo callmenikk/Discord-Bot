@@ -69,7 +69,7 @@ client.on("message", async (message) => {
         {
           name: "**მაღალი როლის კომანდები**",
           value: "-",
-        }
+        } 
       )
       .addFields(
         {
