@@ -1,9 +1,5 @@
 # Discord-Bot
 
-Discord Bot Which is made for Server - **[პროგრამირება](https://discord.gg/Up5MurgsWq)**
-
-## პროგრამირება-Bot v1.0
-
 prefix - `->`
 
 **Commands**
